@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#fbbf24">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Lawnchair Coach</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ══ HEADER ══════════════════════════════ -->
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-icon">⚽</span>
+      <span class="brand-name">Lawnchair Coach</span>
+    </div>
+    <button id="btn-reset" class="btn-reset" aria-label="Reset field (hold)">
+      <!-- Rotate / reset icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/>
+      </svg>
+      RESET
+    </button>
+  </header>
+
+  <!-- ══ LEGEND ══════════════════════════════ -->
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot legend-dot-you"></div>
+      Your kid
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot legend-dot-teammate"></div>
+      Teammates
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot legend-dot-opponent"></div>
+      Opponents
+    </div>
+  </div>
+
+  <!-- ══ FIELD ════════════════════════════════ -->
+  <div class="field-wrapper">
+    <div id="field">
+      <!-- Field markings -->
+      <div class="field-mark line-center"></div>
+      <div class="field-mark circle-center"></div>
+      <div class="field-mark box-top"></div>
+      <div class="field-mark box-bottom"></div>
+      <div class="field-mark goal-top"></div>
+      <div class="field-mark goal-bottom"></div>
+
+      <!-- SVG overlay: build-out lines + corner arcs -->
+      <svg class="field-mark" style="top:0;left:0;width:100%;height:100%;" viewBox="0 0 200 300" preserveAspectRatio="none">
+        <!-- Build-out lines (dashed, at 1/3 and 2/3 field) -->
+        <line x1="0" y1="100" x2="200" y2="100" stroke="white" stroke-width="1.5" stroke-opacity="0.3" stroke-dasharray="6 4"/>
+        <line x1="0" y1="200" x2="200" y2="200" stroke="white" stroke-width="1.5" stroke-opacity="0.3" stroke-dasharray="6 4"/>
+        <!-- Corner arcs -->
+        <path d="M 10 0 A 10 10 0 0 1 0 10"        fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+        <path d="M 190 0 A 10 10 0 0 0 200 10"     fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+        <path d="M 0 290 A 10 10 0 0 1 10 300"     fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+        <path d="M 200 290 A 10 10 0 0 0 190 300"  fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+      </svg>
+
+      <!-- Drawing canvas (pointer-events:none; field captures touches) -->
+      <canvas id="draw-canvas"></canvas>
+
+      <!-- Tokens injected by app.js -->
+    </div>
+  </div>
+
+  <!-- ══ DRAW MODE BANNER (visible when drawing) ══ -->
+  <div class="draw-banner">
+    <span class="draw-banner-label">DRAW MODE</span>
+    <span class="draw-banner-hint">Drag tokens · Draw on field</span>
+  </div>
+
+  <!-- ══ TOOLBAR ══════════════════════════════ -->
+  <div class="toolbar">
+
+    <!-- Draw toggle -->
+    <button id="btn-draw" class="tool-btn" aria-label="Toggle draw mode">
+      <!-- Pencil icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/>
+      </svg>
+      Draw
+    </button>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Undo last stroke -->
+    <button id="btn-undo" class="tool-btn" aria-label="Undo last stroke" disabled>
+      <!-- Undo / arrow-uturn-left icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/>
+      </svg>
+      Undo
+    </button>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Clear all drawings -->
+    <button id="btn-clear" class="tool-btn" aria-label="Clear all drawings" disabled>
+      <!-- Trash icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
+      </svg>
+      Clear
+    </button>
+
+  </div>
+
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

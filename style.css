@@ -1,0 +1,341 @@
+:root {
+  --bg:           #0a0a0a;
+  --surface:      #161616;
+  --border:       #2a2a2a;
+  --field-bg:     #0a1f10;
+  --gray:         #6b7280;
+  --white:        #f5f5f5;
+
+  /* Token colors */
+  --token-you:      #fbbf24; /* amber/gold */
+  --token-teammate: #f5f5f5; /* white */
+  --token-opponent: #ef4444; /* red */
+
+  --draw-yellow:  rgba(250, 204, 21, 0.9);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--white);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* ── App Shell ──────────────────────────────── */
+#app {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Header ─────────────────────────────────── */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: max(14px, env(safe-area-inset-top)) 20px 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+.brand-name {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--white);
+}
+
+/* Reset button */
+.btn-reset {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  color: var(--gray);
+  padding: 7px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-reset svg { width: 16px; height: 16px; }
+.btn-reset:active,
+.btn-reset.hold-active {
+  border-color: rgba(250,204,21,0.6);
+  color: rgba(250,204,21,0.9);
+}
+.btn-reset.flash {
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+/* ── Field Wrapper ───────────────────────────── */
+.field-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  min-height: 0;
+}
+
+/* ── Soccer Field ────────────────────────────── */
+#field {
+  position: relative;
+  background: var(--field-bg);
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  height: 100%;
+  aspect-ratio: 2 / 3;
+  max-width: 100%;
+  transition: border-color 0.2s;
+  overflow: hidden;
+}
+
+/* Field border highlights when drawing */
+.draw-mode-active #field {
+  border-color: rgba(250, 204, 21, 0.8);
+}
+
+/* ── Field Markings ──────────────────────────── */
+.field-mark {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+.line-center {
+  left: 0; right: 0;
+  top: 50%;
+  height: 1.5px;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translateY(-50%);
+}
+.circle-center {
+  left: 50%; top: 50%;
+  width: 22%; aspect-ratio: 1;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.box-top {
+  left: 50%; top: 0;
+  width: 52%; height: 16%;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  border-top: none;
+  transform: translateX(-50%);
+}
+.box-bottom {
+  left: 50%; bottom: 0;
+  width: 52%; height: 16%;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  border-bottom: none;
+  transform: translateX(-50%);
+}
+.goal-top {
+  left: 50%; top: 0;
+  width: 26%; height: 5%;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  border-top: none;
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateX(-50%);
+}
+.goal-bottom {
+  left: 50%; bottom: 0;
+  width: 26%; height: 5%;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  border-bottom: none;
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateX(-50%);
+}
+
+/* ── Draw Canvas ─────────────────────────────── */
+#draw-canvas {
+  display: none;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 10;
+  pointer-events: none; /* touches fall through to tokens and field */
+}
+
+/* ── Player Tokens ───────────────────────────── */
+.token {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  touch-action: none;
+  cursor: grab;
+  z-index: 20;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.55);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.token-you {
+  background: var(--token-you);
+  color: #1a1a1a;
+  width: 48px;
+  height: 48px;
+  font-size: 12px;
+  z-index: 25;
+  box-shadow: 0 2px 14px rgba(251, 191, 36, 0.45);
+  outline: 2.5px solid rgba(251, 191, 36, 0.55);
+  outline-offset: 2px;
+}
+
+.token-teammate {
+  background: var(--token-teammate);
+  color: #111827;
+}
+
+.token-opponent {
+  background: var(--token-opponent);
+  color: #fff;
+}
+
+.token.dragging {
+  transform: translate(-50%, -50%) scale(1.2);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
+  z-index: 50;
+  opacity: 0.9;
+}
+
+/* ── Draw Mode Banner ────────────────────────── */
+.draw-banner {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 20px;
+  background: rgba(250, 204, 21, 0.10);
+  border-top: 1px solid rgba(250, 204, 21, 0.28);
+  flex-shrink: 0;
+}
+.draw-mode-active .draw-banner {
+  display: flex;
+}
+.draw-banner-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--draw-yellow);
+}
+.draw-banner-hint {
+  font-size: 11px;
+  color: rgba(250, 204, 21, 0.55);
+  letter-spacing: 0.2px;
+}
+
+/* ── Bottom Toolbar ──────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 10px 20px max(16px, env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  color: var(--gray);
+  padding: 10px 22px;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: color 0.15s, border-color 0.15s, opacity 0.15s;
+  min-width: 72px;
+}
+.tool-btn svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.tool-btn:active:not(:disabled) {
+  opacity: 0.7;
+}
+.tool-btn:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+/* Draw button active state */
+.tool-btn#btn-draw.active {
+  border-color: rgba(250, 204, 21, 0.65);
+  color: var(--draw-yellow);
+}
+
+/* Dividers between toolbar buttons */
+.toolbar-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ── Legend ──────────────────────────────────── */
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 6px 0 2px;
+  flex-shrink: 0;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray);
+  letter-spacing: 0.4px;
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.legend-dot-you      { background: var(--token-you); }
+.legend-dot-teammate { background: var(--token-teammate); }
+.legend-dot-opponent { background: var(--token-opponent); }
