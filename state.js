@@ -15,88 +15,76 @@ export const SETTINGS_KEY     = 'lc-settings';
 // ─────────────────────────────────────────────
 export const FORMATIONS = {
 
-  '5v5': {
-    // 1-2-1 shape — our team
-    you:  { x: 50, y: 44, type: 'you',      label: 'You' },
-    t1:   { x: 50, y: 90, type: 'teammate', label: 'T1' }, // GK
-    t2:   { x: 30, y: 75, type: 'teammate', label: 'T2' }, // Def-L
-    t3:   { x: 70, y: 75, type: 'teammate', label: 'T3' }, // Def-R
-    t4:   { x: 50, y: 60, type: 'teammate', label: 'T4' }, // Mid
-    // 1-2-1 opponents
-    o1:   { x: 50, y: 10, type: 'opponent', label: 'O1' }, // GK
-    o2:   { x: 30, y: 25, type: 'opponent', label: 'O2' }, // Def-L
-    o3:   { x: 70, y: 25, type: 'opponent', label: 'O3' }, // Def-R
-    o4:   { x: 50, y: 40, type: 'opponent', label: 'O4' }, // Mid
-    o5:   { x: 50, y: 56, type: 'opponent', label: 'O5' }, // Fwd
-  },
-
+  // ── 7v7 · 3-3 ──────────────────────────────
+  // GK + 3 defenders + 3 forwards (You = Fwd-C)
+  // All our tokens y ≥ 55 · All opponent tokens y ≤ 45
   '7v7': {
-    // 2-3-1 shape — our team
-    you:  { x: 50, y: 46, type: 'you',      label: 'You' },
+    you:  { x: 50, y: 60, type: 'you',      label: 'You' }, // Fwd-C
     t1:   { x: 50, y: 90, type: 'teammate', label: 'T1' }, // GK
-    t2:   { x: 27, y: 76, type: 'teammate', label: 'T2' }, // Def-L
-    t3:   { x: 73, y: 76, type: 'teammate', label: 'T3' }, // Def-R
-    t4:   { x: 17, y: 62, type: 'teammate', label: 'T4' }, // Mid-L
-    t5:   { x: 50, y: 61, type: 'teammate', label: 'T5' }, // Mid-C
-    t6:   { x: 83, y: 62, type: 'teammate', label: 'T6' }, // Mid-R
-    // 2-3-1 opponents
+    t2:   { x: 18, y: 78, type: 'teammate', label: 'T2' }, // Def-L
+    t3:   { x: 50, y: 76, type: 'teammate', label: 'T3' }, // Def-C
+    t4:   { x: 82, y: 78, type: 'teammate', label: 'T4' }, // Def-R
+    t5:   { x: 20, y: 62, type: 'teammate', label: 'T5' }, // Fwd-L
+    t6:   { x: 80, y: 62, type: 'teammate', label: 'T6' }, // Fwd-R
     o1:   { x: 50, y: 10, type: 'opponent', label: 'O1' }, // GK
-    o2:   { x: 27, y: 24, type: 'opponent', label: 'O2' }, // Def-L
-    o3:   { x: 73, y: 24, type: 'opponent', label: 'O3' }, // Def-R
-    o4:   { x: 17, y: 38, type: 'opponent', label: 'O4' }, // Mid-L
-    o5:   { x: 50, y: 39, type: 'opponent', label: 'O5' }, // Mid-C
-    o6:   { x: 83, y: 38, type: 'opponent', label: 'O6' }, // Mid-R
-    o7:   { x: 50, y: 54, type: 'opponent', label: 'O7' }, // Fwd
+    o2:   { x: 18, y: 22, type: 'opponent', label: 'O2' }, // Def-L
+    o3:   { x: 50, y: 24, type: 'opponent', label: 'O3' }, // Def-C
+    o4:   { x: 82, y: 22, type: 'opponent', label: 'O4' }, // Def-R
+    o5:   { x: 20, y: 38, type: 'opponent', label: 'O5' }, // Fwd-L
+    o6:   { x: 50, y: 40, type: 'opponent', label: 'O6' }, // Fwd-C
+    o7:   { x: 80, y: 38, type: 'opponent', label: 'O7' }, // Fwd-R
   },
 
+  // ── 9v9 · 3-2-2 ────────────────────────────
+  // GK + 3 def + 2 mid + 2 fwd + You (striker) = 9
+  // All our tokens y ≥ 55 · All opponent tokens y ≤ 45
   '9v9': {
-    // 3-3-2 shape — our team
-    you:  { x: 70, y: 46, type: 'you',      label: 'You' },
+    you:  { x: 50, y: 55, type: 'you',      label: 'You' }, // Striker
     t1:   { x: 50, y: 90, type: 'teammate', label: 'T1' }, // GK
-    t2:   { x: 20, y: 76, type: 'teammate', label: 'T2' }, // Def-L
-    t3:   { x: 50, y: 74, type: 'teammate', label: 'T3' }, // Def-C
-    t4:   { x: 80, y: 76, type: 'teammate', label: 'T4' }, // Def-R
-    t5:   { x: 27, y: 61, type: 'teammate', label: 'T5' }, // Mid-L
-    t6:   { x: 50, y: 59, type: 'teammate', label: 'T6' }, // Mid-C
-    t7:   { x: 73, y: 61, type: 'teammate', label: 'T7' }, // Mid-R
-    t8:   { x: 30, y: 46, type: 'teammate', label: 'T8' }, // Fwd-L
-    // 3-3-2 opponents
+    t2:   { x: 18, y: 79, type: 'teammate', label: 'T2' }, // Def-L
+    t3:   { x: 50, y: 77, type: 'teammate', label: 'T3' }, // Def-C
+    t4:   { x: 82, y: 79, type: 'teammate', label: 'T4' }, // Def-R
+    t5:   { x: 28, y: 67, type: 'teammate', label: 'T5' }, // Mid-L
+    t6:   { x: 72, y: 67, type: 'teammate', label: 'T6' }, // Mid-R
+    t7:   { x: 25, y: 57, type: 'teammate', label: 'T7' }, // Fwd-L
+    t8:   { x: 75, y: 57, type: 'teammate', label: 'T8' }, // Fwd-R
     o1:   { x: 50, y: 10, type: 'opponent', label: 'O1' }, // GK
-    o2:   { x: 20, y: 24, type: 'opponent', label: 'O2' }, // Def-L
-    o3:   { x: 50, y: 26, type: 'opponent', label: 'O3' }, // Def-C
-    o4:   { x: 80, y: 24, type: 'opponent', label: 'O4' }, // Def-R
-    o5:   { x: 27, y: 39, type: 'opponent', label: 'O5' }, // Mid-L
-    o6:   { x: 50, y: 41, type: 'opponent', label: 'O6' }, // Mid-C
-    o7:   { x: 73, y: 39, type: 'opponent', label: 'O7' }, // Mid-R
-    o8:   { x: 30, y: 54, type: 'opponent', label: 'O8' }, // Fwd-L
-    o9:   { x: 70, y: 54, type: 'opponent', label: 'O9' }, // Fwd-R
+    o2:   { x: 18, y: 21, type: 'opponent', label: 'O2' }, // Def-L
+    o3:   { x: 50, y: 23, type: 'opponent', label: 'O3' }, // Def-C
+    o4:   { x: 82, y: 21, type: 'opponent', label: 'O4' }, // Def-R
+    o5:   { x: 28, y: 33, type: 'opponent', label: 'O5' }, // Mid-L
+    o6:   { x: 72, y: 33, type: 'opponent', label: 'O6' }, // Mid-R
+    o7:   { x: 25, y: 43, type: 'opponent', label: 'O7' }, // Fwd-L
+    o8:   { x: 75, y: 43, type: 'opponent', label: 'O8' }, // Fwd-R
+    o9:   { x: 50, y: 45, type: 'opponent', label: 'O9' }, // Striker
   },
 
+  // ── 11v11 · 4-3-3 ──────────────────────────
+  // GK + 4 def + 3 mid + 2 fwd + You (Fwd-R) = 11
+  // All our tokens y ≥ 55 · All opponent tokens y ≤ 45
   '11v11': {
-    // 4-3-3 shape — our team
-    you:  { x: 75, y: 47, type: 'you',      label: 'You' },
+    you:  { x: 75, y: 57, type: 'you',      label: 'You' }, // Fwd-R
     t1:   { x: 50, y: 91, type: 'teammate', label: 'T1'  }, // GK
-    t2:   { x: 17, y: 78, type: 'teammate', label: 'T2'  }, // Def-L
-    t3:   { x: 38, y: 76, type: 'teammate', label: 'T3'  }, // Def-CL
-    t4:   { x: 62, y: 76, type: 'teammate', label: 'T4'  }, // Def-CR
-    t5:   { x: 83, y: 78, type: 'teammate', label: 'T5'  }, // Def-R
-    t6:   { x: 20, y: 63, type: 'teammate', label: 'T6'  }, // Mid-L
-    t7:   { x: 50, y: 61, type: 'teammate', label: 'T7'  }, // Mid-C
-    t8:   { x: 80, y: 63, type: 'teammate', label: 'T8'  }, // Mid-R
-    t9:   { x: 25, y: 47, type: 'teammate', label: 'T9'  }, // Fwd-L
-    t10:  { x: 50, y: 45, type: 'teammate', label: 'T10' }, // Fwd-C
-    // 4-3-3 opponents
+    t2:   { x: 15, y: 80, type: 'teammate', label: 'T2'  }, // Def-L
+    t3:   { x: 37, y: 78, type: 'teammate', label: 'T3'  }, // Def-CL
+    t4:   { x: 63, y: 78, type: 'teammate', label: 'T4'  }, // Def-CR
+    t5:   { x: 85, y: 80, type: 'teammate', label: 'T5'  }, // Def-R
+    t6:   { x: 20, y: 67, type: 'teammate', label: 'T6'  }, // Mid-L
+    t7:   { x: 50, y: 65, type: 'teammate', label: 'T7'  }, // Mid-C
+    t8:   { x: 80, y: 67, type: 'teammate', label: 'T8'  }, // Mid-R
+    t9:   { x: 25, y: 57, type: 'teammate', label: 'T9'  }, // Fwd-L
+    t10:  { x: 50, y: 55, type: 'teammate', label: 'T10' }, // Fwd-C
     o1:   { x: 50, y:  9, type: 'opponent', label: 'O1'  }, // GK
-    o2:   { x: 17, y: 22, type: 'opponent', label: 'O2'  }, // Def-L
-    o3:   { x: 38, y: 24, type: 'opponent', label: 'O3'  }, // Def-CL
-    o4:   { x: 62, y: 24, type: 'opponent', label: 'O4'  }, // Def-CR
-    o5:   { x: 83, y: 22, type: 'opponent', label: 'O5'  }, // Def-R
-    o6:   { x: 20, y: 37, type: 'opponent', label: 'O6'  }, // Mid-L
-    o7:   { x: 50, y: 39, type: 'opponent', label: 'O7'  }, // Mid-C
-    o8:   { x: 80, y: 37, type: 'opponent', label: 'O8'  }, // Mid-R
-    o9:   { x: 25, y: 53, type: 'opponent', label: 'O9'  }, // Fwd-L
-    o10:  { x: 50, y: 55, type: 'opponent', label: 'O10' }, // Fwd-C
-    o11:  { x: 75, y: 53, type: 'opponent', label: 'O11' }, // Fwd-R
+    o2:   { x: 15, y: 20, type: 'opponent', label: 'O2'  }, // Def-L
+    o3:   { x: 37, y: 22, type: 'opponent', label: 'O3'  }, // Def-CL
+    o4:   { x: 63, y: 22, type: 'opponent', label: 'O4'  }, // Def-CR
+    o5:   { x: 85, y: 20, type: 'opponent', label: 'O5'  }, // Def-R
+    o6:   { x: 20, y: 33, type: 'opponent', label: 'O6'  }, // Mid-L
+    o7:   { x: 50, y: 35, type: 'opponent', label: 'O7'  }, // Mid-C
+    o8:   { x: 80, y: 33, type: 'opponent', label: 'O8'  }, // Mid-R
+    o9:   { x: 25, y: 43, type: 'opponent', label: 'O9'  }, // Fwd-L
+    o10:  { x: 50, y: 45, type: 'opponent', label: 'O10' }, // Fwd-C
+    o11:  { x: 75, y: 43, type: 'opponent', label: 'O11' }, // Fwd-R
   },
 };
 
@@ -105,7 +93,7 @@ export const FORMATIONS = {
 // ─────────────────────────────────────────────
 export const settings = {
   kidName:  '',      // '' → render default label 'You'
-  teamSize: '7v7',   // '5v5' | '7v7' | '9v9' | '11v11'
+  teamSize: '7v7',   // '7v7' | '9v9' | '11v11'
 };
 
 export function loadSettings() {

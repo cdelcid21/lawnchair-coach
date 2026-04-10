@@ -443,7 +443,7 @@ html, body {
 /* Team size grid — 4 equal buttons */
 .team-size-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 }
 .size-btn {
