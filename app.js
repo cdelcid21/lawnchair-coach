@@ -1,42 +1,49 @@
 import {
-  state,
-  DEFAULT_POSITIONS,
-  FREE_DRAG_MIN_PCT,
-  FREE_DRAG_MAX_PCT,
-  RESET_HOLD_MS,
+  state, settings, FORMATIONS,
+  FREE_DRAG_MIN_PCT, FREE_DRAG_MAX_PCT, RESET_HOLD_MS,
+  loadSettings, saveSettings,
 } from './state.js';
 
 // ─────────────────────────────────────────────
 //  ELEMENTS
 // ─────────────────────────────────────────────
-const appEl      = document.getElementById('app');
-const fieldEl    = document.getElementById('field');
-const drawCanvas = document.getElementById('draw-canvas');
-const btnDraw    = document.getElementById('btn-draw');
-const btnUndo    = document.getElementById('btn-undo');
-const btnClear   = document.getElementById('btn-clear');
-const btnReset   = document.getElementById('btn-reset');
-const ctx        = drawCanvas.getContext('2d');
+const appEl          = document.getElementById('app');
+const fieldEl        = document.getElementById('field');
+const drawCanvas     = document.getElementById('draw-canvas');
+const btnDraw        = document.getElementById('btn-draw');
+const btnUndo        = document.getElementById('btn-undo');
+const btnClear       = document.getElementById('btn-clear');
+const btnReset       = document.getElementById('btn-reset');
+const btnSettings    = document.getElementById('btn-settings');
+const settingsOverlay = document.getElementById('settings-overlay');
+const settingsSheet  = document.getElementById('settings-sheet');
+const inputKidName   = document.getElementById('input-kid-name');
+const teamSizeGrid   = document.getElementById('team-size-grid');
+const btnDone        = document.getElementById('btn-settings-done');
+const ctx            = drawCanvas.getContext('2d');
 
 // ─────────────────────────────────────────────
 //  TOKEN INIT & RENDER
 // ─────────────────────────────────────────────
 function cloneDefaults() {
+  const formation = FORMATIONS[settings.teamSize];
   const tokens = {};
-  for (const [id, pos] of Object.entries(DEFAULT_POSITIONS)) {
+  for (const [id, pos] of Object.entries(formation)) {
     tokens[id] = { ...pos };
   }
   return tokens;
 }
 
-state.tokens = cloneDefaults();
+function youLabel() {
+  return settings.kidName.trim() || 'You';
+}
 
 function renderTokens() {
   document.querySelectorAll('.token').forEach(el => el.remove());
   for (const [id, token] of Object.entries(state.tokens)) {
     const el = document.createElement('div');
     el.className = `token token-${token.type}`;
-    el.textContent = token.label;
+    el.textContent = id === 'you' ? youLabel() : token.label;
     el.dataset.id = id;
     el.style.left = token.x + '%';
     el.style.top  = token.y + '%';
@@ -52,7 +59,7 @@ let dragging = null;
 
 function onTokenTouchStart(e) {
   e.preventDefault();
-  e.stopPropagation(); // prevent field draw handler from firing
+  e.stopPropagation();
   const tokenEl = e.currentTarget;
   const id = tokenEl.dataset.id;
   dragging = { id, el: tokenEl };
@@ -105,7 +112,6 @@ function clearCanvas() {
   ctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
 }
 
-// Strokes store normalized fractions (0–1); convert to px for drawing
 function fracToPx(frac) {
   return { x: frac.x * drawCanvas.width, y: frac.y * drawCanvas.height };
 }
@@ -182,7 +188,7 @@ function updateToolbar() {
 // ─────────────────────────────────────────────
 fieldEl.addEventListener('touchstart', e => {
   if (!state.drawMode) return;
-  if (e.target.closest('.token')) return; // tokens handle their own drag
+  if (e.target.closest('.token')) return;
 
   e.preventDefault();
   const stroke = { points: [] };
@@ -252,6 +258,51 @@ function doReset() {
 }
 
 // ─────────────────────────────────────────────
+//  SETTINGS SHEET
+// ─────────────────────────────────────────────
+function openSettings() {
+  inputKidName.value = settings.kidName;
+  updateSizeBtns();
+  settingsOverlay.classList.add('open');
+  settingsSheet.classList.add('open');
+}
+
+function closeSettings() {
+  settingsOverlay.classList.remove('open');
+  settingsSheet.classList.remove('open');
+}
+
+function updateSizeBtns() {
+  teamSizeGrid.querySelectorAll('.size-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.size === settings.teamSize);
+  });
+}
+
+btnSettings.addEventListener('click', openSettings);
+btnDone.addEventListener('click', closeSettings);
+settingsOverlay.addEventListener('click', closeSettings);
+
+// Kid's name — update token label in real time
+inputKidName.addEventListener('input', () => {
+  settings.kidName = inputKidName.value.slice(0, 6);
+  saveSettings();
+  const youEl = fieldEl.querySelector('.token-you');
+  if (youEl) youEl.textContent = youLabel();
+});
+
+// Team size — reset field when changed
+teamSizeGrid.addEventListener('click', e => {
+  const btn = e.target.closest('.size-btn');
+  if (!btn) return;
+  const size = btn.dataset.size;
+  if (size === settings.teamSize) return;
+  settings.teamSize = size;
+  saveSettings();
+  updateSizeBtns();
+  doReset();
+});
+
+// ─────────────────────────────────────────────
 //  SERVICE WORKER
 // ─────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -261,5 +312,7 @@ if ('serviceWorker' in navigator) {
 // ─────────────────────────────────────────────
 //  INIT
 // ─────────────────────────────────────────────
+loadSettings();
+state.tokens = cloneDefaults();
 renderTokens();
 updateToolbar();

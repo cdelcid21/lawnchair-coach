@@ -67,29 +67,34 @@ html, body {
   color: var(--white);
 }
 
-/* Reset button */
-.btn-reset {
+/* Header action buttons (settings gear + reset) */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-icon-action {
   background: transparent;
   border: 1.5px solid var(--border);
   border-radius: 8px;
   color: var(--gray);
-  padding: 7px 10px;
+  padding: 7px 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  justify-content: center;
   transition: border-color 0.2s, color 0.2s;
 }
-.btn-reset svg { width: 16px; height: 16px; }
-.btn-reset:active,
-.btn-reset.hold-active {
-  border-color: rgba(250,204,21,0.6);
-  color: rgba(250,204,21,0.9);
+.btn-icon-action svg { width: 18px; height: 18px; }
+.btn-icon-action:active { opacity: 0.7; }
+
+/* Reset-specific states */
+#btn-reset.hold-active {
+  border-color: rgba(250, 204, 21, 0.6);
+  color: rgba(250, 204, 21, 0.9);
 }
-.btn-reset.flash {
+#btn-reset.flash {
   border-color: #22c55e;
   color: #22c55e;
 }
@@ -339,3 +344,140 @@ html, body {
 .legend-dot-you      { background: var(--token-you); }
 .legend-dot-teammate { background: var(--token-teammate); }
 .legend-dot-opponent { background: var(--token-opponent); }
+
+/* ── Settings Sheet ──────────────────────────── */
+
+/* Dark overlay behind the sheet */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.settings-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Sheet — slides up from bottom, same easing as rec-specs game sheet */
+.settings-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 500;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  border-top: 1px solid var(--border);
+  padding: 0 24px max(32px, env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.settings-sheet.open {
+  transform: translateY(0);
+}
+
+/* Drag handle (matches rec-specs .sheet-handle pattern) */
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  margin: 14px auto 4px;
+  flex-shrink: 0;
+}
+
+.sheet-title {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--white);
+  margin: 12px 0 24px;
+}
+
+/* Setting groups */
+.setting-group {
+  margin-bottom: 28px;
+}
+.setting-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gray);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.setting-hint {
+  font-size: 11px;
+  color: var(--gray);
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+/* Kid's name input */
+.setting-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--white);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 14px;
+  -webkit-appearance: none;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.setting-input:focus {
+  border-color: var(--token-you);
+}
+.setting-input::placeholder {
+  color: var(--gray);
+  opacity: 0.6;
+}
+
+/* Team size grid — 4 equal buttons */
+.team-size-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.size-btn {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--gray);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 12px 0;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  text-align: center;
+}
+.size-btn:active { opacity: 0.75; }
+.size-btn.active {
+  border-color: var(--token-you);
+  color: var(--token-you);
+  background: rgba(251, 191, 36, 0.08);
+}
+
+/* Done button */
+.btn-done {
+  width: 100%;
+  background: var(--token-you);
+  color: #111827;
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  margin-top: 4px;
+  transition: opacity 0.1s;
+}
+.btn-done:active { opacity: 0.85; }
