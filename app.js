@@ -1,5 +1,5 @@
 import {
-  state, settings, FORMATIONS, POSITION_COORDS,
+  state, settings, FORMATIONS, DEFAULT_POSITION,
   FREE_DRAG_MIN_PCT, FREE_DRAG_MAX_PCT, RESET_HOLD_MS,
   loadSettings, saveSettings,
 } from './state.js';
@@ -28,15 +28,23 @@ const ctx            = drawCanvas.getContext('2d');
 //  TOKEN INIT & RENDER
 // ─────────────────────────────────────────────
 function cloneDefaults() {
-  const formation = FORMATIONS[settings.teamSize];
+  const { slots, opponents } = FORMATIONS[settings.teamSize];
   const tokens = {};
-  for (const [id, pos] of Object.entries(formation)) {
-    tokens[id] = { ...pos };
+
+  // Our team: the selected slot becomes "you", all others become teammates
+  for (const slot of slots) {
+    if (slot.key === settings.kidPosition) {
+      tokens.you = { x: slot.x, y: slot.y, type: 'you', label: 'You' };
+    } else {
+      tokens[slot.key] = { x: slot.x, y: slot.y, type: 'teammate', label: slot.label };
+    }
   }
-  // Override You position based on the selected position setting
-  const posCoords = POSITION_COORDS[settings.teamSize][settings.kidPosition];
-  tokens.you.x = posCoords.x;
-  tokens.you.y = posCoords.y;
+
+  // Opponents
+  for (const opp of opponents) {
+    tokens[opp.key] = { x: opp.x, y: opp.y, type: 'opponent', label: opp.label };
+  }
+
   return tokens;
 }
 
@@ -266,13 +274,19 @@ function doReset() {
   updateToolbar();
 }
 
+// Rebuild tokens only (keeps strokes) — used when only position changes
+function rebuildTokens() {
+  state.tokens = cloneDefaults();
+  renderTokens();
+}
+
 // ─────────────────────────────────────────────
 //  SETTINGS SHEET
 // ─────────────────────────────────────────────
 function openSettings() {
   inputKidName.value = settings.kidName;
   updateSizeBtns();
-  updatePosBtns();
+  renderPosGrid();
   toggleOpponents.checked = settings.showOpponents;
   settingsOverlay.classList.add('open');
   settingsSheet.classList.add('open');
@@ -289,10 +303,16 @@ function updateSizeBtns() {
   });
 }
 
-function updatePosBtns() {
-  posGrid.querySelectorAll('.size-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.pos === settings.kidPosition);
-  });
+function renderPosGrid() {
+  const { slots } = FORMATIONS[settings.teamSize];
+  posGrid.innerHTML = '';
+  for (const slot of slots) {
+    const btn = document.createElement('button');
+    btn.className = 'size-btn' + (slot.key === settings.kidPosition ? ' active' : '');
+    btn.dataset.pos = slot.key;
+    btn.textContent = slot.name;
+    posGrid.appendChild(btn);
+  }
 }
 
 btnSettings.addEventListener('click', openSettings);
@@ -314,12 +334,18 @@ teamSizeGrid.addEventListener('click', e => {
   const size = btn.dataset.size;
   if (size === settings.teamSize) return;
   settings.teamSize = size;
+  // If current position slot doesn't exist in new formation, reset to default
+  const newSlots = FORMATIONS[size].slots;
+  if (!newSlots.find(s => s.key === settings.kidPosition)) {
+    settings.kidPosition = DEFAULT_POSITION[size];
+  }
   saveSettings();
   updateSizeBtns();
+  renderPosGrid();
   doReset();
 });
 
-// Kid's position — move You token immediately
+// Kid's position — rebuild tokens (keeps drawings)
 posGrid.addEventListener('click', e => {
   const btn = e.target.closest('.size-btn');
   if (!btn) return;
@@ -327,15 +353,8 @@ posGrid.addEventListener('click', e => {
   if (pos === settings.kidPosition) return;
   settings.kidPosition = pos;
   saveSettings();
-  updatePosBtns();
-  const coords = POSITION_COORDS[settings.teamSize][pos];
-  state.tokens.you.x = coords.x;
-  state.tokens.you.y = coords.y;
-  const youEl = fieldEl.querySelector('.token-you');
-  if (youEl) {
-    youEl.style.left = coords.x + '%';
-    youEl.style.top  = coords.y + '%';
-  }
+  renderPosGrid();
+  rebuildTokens();
 });
 
 // Show/hide opponents

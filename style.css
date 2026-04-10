@@ -460,6 +460,11 @@ html, body {
   transition: border-color 0.15s, color 0.15s, background 0.15s;
   text-align: center;
 }
+/* Slightly smaller text for granular position buttons */
+#pos-grid .size-btn {
+  font-size: 11px;
+  padding: 11px 0;
+}
 .size-btn:active { opacity: 0.75; }
 .size-btn.active {
   border-color: var(--token-you);

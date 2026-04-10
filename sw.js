@@ -1,5 +1,5 @@
 // Bump VERSION on every deploy so users always receive the latest files.
-const VERSION = '2026-04-09.4';
+const VERSION = '2026-04-09.5';
 const CACHE   = `lawnchair-coach-${VERSION}`;
 const ASSETS  = ['./', './index.html', './style.css', './app.js', './state.js', './manifest.json'];
 
