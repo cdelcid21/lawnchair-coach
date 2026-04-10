@@ -144,6 +144,30 @@
       <p class="setting-hint">Resets the field to the selected formation.</p>
     </div>
 
+    <!-- Kid's position -->
+    <div class="setting-group">
+      <label class="setting-label">Your kid's position</label>
+      <div class="team-size-grid" id="pos-grid">
+        <button class="size-btn" data-pos="gk">GK</button>
+        <button class="size-btn" data-pos="def">DEF</button>
+        <button class="size-btn" data-pos="mid">MID</button>
+        <button class="size-btn" data-pos="fwd">FWD</button>
+      </div>
+      <p class="setting-hint">Moves the gold token to that starting zone.</p>
+    </div>
+
+    <!-- Show / hide opponents -->
+    <div class="setting-group setting-row">
+      <div>
+        <div class="setting-label">Show opposing team</div>
+        <p class="setting-hint">Display opponent tokens on the field.</p>
+      </div>
+      <label class="toggle" aria-label="Show opposing team">
+        <input type="checkbox" id="toggle-opponents" checked>
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+
     <button id="btn-settings-done" class="btn-done">Done</button>
   </div>
 

@@ -1,5 +1,5 @@
 import {
-  state, settings, FORMATIONS,
+  state, settings, FORMATIONS, POSITION_COORDS,
   FREE_DRAG_MIN_PCT, FREE_DRAG_MAX_PCT, RESET_HOLD_MS,
   loadSettings, saveSettings,
 } from './state.js';
@@ -14,12 +14,14 @@ const btnDraw        = document.getElementById('btn-draw');
 const btnUndo        = document.getElementById('btn-undo');
 const btnClear       = document.getElementById('btn-clear');
 const btnReset       = document.getElementById('btn-reset');
-const btnSettings    = document.getElementById('btn-settings');
+const btnSettings     = document.getElementById('btn-settings');
 const settingsOverlay = document.getElementById('settings-overlay');
-const settingsSheet  = document.getElementById('settings-sheet');
-const inputKidName   = document.getElementById('input-kid-name');
-const teamSizeGrid   = document.getElementById('team-size-grid');
-const btnDone        = document.getElementById('btn-settings-done');
+const settingsSheet   = document.getElementById('settings-sheet');
+const inputKidName    = document.getElementById('input-kid-name');
+const teamSizeGrid    = document.getElementById('team-size-grid');
+const posGrid         = document.getElementById('pos-grid');
+const toggleOpponents = document.getElementById('toggle-opponents');
+const btnDone         = document.getElementById('btn-settings-done');
 const ctx            = drawCanvas.getContext('2d');
 
 // ─────────────────────────────────────────────
@@ -31,6 +33,10 @@ function cloneDefaults() {
   for (const [id, pos] of Object.entries(formation)) {
     tokens[id] = { ...pos };
   }
+  // Override You position based on the selected position setting
+  const posCoords = POSITION_COORDS[settings.teamSize][settings.kidPosition];
+  tokens.you.x = posCoords.x;
+  tokens.you.y = posCoords.y;
   return tokens;
 }
 
@@ -43,6 +49,9 @@ function renderTokens() {
   for (const [id, token] of Object.entries(state.tokens)) {
     const el = document.createElement('div');
     el.className = `token token-${token.type}`;
+    if (token.type === 'opponent' && !settings.showOpponents) {
+      el.classList.add('token-hidden');
+    }
     el.textContent = id === 'you' ? youLabel() : token.label;
     el.dataset.id = id;
     el.style.left = token.x + '%';
@@ -263,6 +272,8 @@ function doReset() {
 function openSettings() {
   inputKidName.value = settings.kidName;
   updateSizeBtns();
+  updatePosBtns();
+  toggleOpponents.checked = settings.showOpponents;
   settingsOverlay.classList.add('open');
   settingsSheet.classList.add('open');
 }
@@ -275,6 +286,12 @@ function closeSettings() {
 function updateSizeBtns() {
   teamSizeGrid.querySelectorAll('.size-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.size === settings.teamSize);
+  });
+}
+
+function updatePosBtns() {
+  posGrid.querySelectorAll('.size-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.pos === settings.kidPosition);
   });
 }
 
@@ -300,6 +317,34 @@ teamSizeGrid.addEventListener('click', e => {
   saveSettings();
   updateSizeBtns();
   doReset();
+});
+
+// Kid's position — move You token immediately
+posGrid.addEventListener('click', e => {
+  const btn = e.target.closest('.size-btn');
+  if (!btn) return;
+  const pos = btn.dataset.pos;
+  if (pos === settings.kidPosition) return;
+  settings.kidPosition = pos;
+  saveSettings();
+  updatePosBtns();
+  const coords = POSITION_COORDS[settings.teamSize][pos];
+  state.tokens.you.x = coords.x;
+  state.tokens.you.y = coords.y;
+  const youEl = fieldEl.querySelector('.token-you');
+  if (youEl) {
+    youEl.style.left = coords.x + '%';
+    youEl.style.top  = coords.y + '%';
+  }
+});
+
+// Show/hide opponents
+toggleOpponents.addEventListener('change', () => {
+  settings.showOpponents = toggleOpponents.checked;
+  saveSettings();
+  document.querySelectorAll('.token-opponent').forEach(el => {
+    el.classList.toggle('token-hidden', !settings.showOpponents);
+  });
 });
 
 // ─────────────────────────────────────────────

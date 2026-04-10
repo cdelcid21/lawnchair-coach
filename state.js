@@ -89,11 +89,40 @@ export const FORMATIONS = {
 };
 
 // ─────────────────────────────────────────────
+//  POSITION COORDS
+//  Where the "You" token starts for each position
+//  in each formation. Always centered (x=50) so
+//  the parent can drag to the exact spot.
+// ─────────────────────────────────────────────
+export const POSITION_COORDS = {
+  '7v7': {
+    gk:  { x: 50, y: 90 },
+    def: { x: 50, y: 77 },
+    mid: { x: 50, y: 68 }, // between lines in 3-3
+    fwd: { x: 50, y: 60 },
+  },
+  '9v9': {
+    gk:  { x: 50, y: 90 },
+    def: { x: 50, y: 77 },
+    mid: { x: 50, y: 67 },
+    fwd: { x: 50, y: 55 },
+  },
+  '11v11': {
+    gk:  { x: 50, y: 91 },
+    def: { x: 50, y: 78 },
+    mid: { x: 50, y: 65 },
+    fwd: { x: 50, y: 55 },
+  },
+};
+
+// ─────────────────────────────────────────────
 //  SETTINGS — persisted to localStorage
 // ─────────────────────────────────────────────
 export const settings = {
-  kidName:  '',      // '' → render default label 'You'
-  teamSize: '7v7',   // '7v7' | '9v9' | '11v11'
+  kidName:      '',      // '' → render default label 'You'
+  teamSize:     '7v7',   // '7v7' | '9v9' | '11v11'
+  kidPosition:  'fwd',   // 'gk' | 'def' | 'mid' | 'fwd'
+  showOpponents: true,
 };
 
 export function loadSettings() {
@@ -101,14 +130,20 @@ export function loadSettings() {
     const s = JSON.parse(localStorage.getItem(SETTINGS_KEY));
     if (s?.teamSize && FORMATIONS[s.teamSize]) settings.teamSize = s.teamSize;
     if (typeof s?.kidName === 'string') settings.kidName = s.kidName;
+    if (s?.kidPosition && POSITION_COORDS[settings.teamSize]?.[s.kidPosition]) {
+      settings.kidPosition = s.kidPosition;
+    }
+    if (typeof s?.showOpponents === 'boolean') settings.showOpponents = s.showOpponents;
   } catch {}
 }
 
 export function saveSettings() {
   try {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({
-      kidName:  settings.kidName,
-      teamSize: settings.teamSize,
+      kidName:       settings.kidName,
+      teamSize:      settings.teamSize,
+      kidPosition:   settings.kidPosition,
+      showOpponents: settings.showOpponents,
     }));
   } catch {}
 }
